@@ -1,0 +1,142 @@
+<html>
+{% load static %}
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+<link
+rel="stylesheet"
+href="https://use.fontawesome.com/releases/v5.14.0/css/all.css"/>
+<link rel="stylesheet" href="{% static 'allevent.css' %}"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<div class="container">
+
+<i id="back" class="fa fa-arrow-left" onClick="javascript:history.go(-1);" aria-hidden="true"></i>
+  <h1>All Events</h1>
+  <div class="event_details" id="det_event">
+    <i id="close" class="fa fa-window-close" onclick="close_card()" aria-hidden="true"></i>
+  </div>
+  <div class="events_container" id="events_container">
+</div>
+</div>
+</body>
+</html>
+<script>
+var datacount;
+datacount=0;
+$.ajax({
+
+          type: "GET",
+          url: "{% url 'eventsdata' %}",
+          dataType:'json',
+          headers: {'X-CSRFToken': '{{ csrf_token }}'},
+          async: false,
+          success: function(data) {
+            newdata=data;
+        
+          while(JSON.stringify(data.events[datacount])!=null)
+            {
+             datacount++;
+
+            }
+            for(i = 0;i<datacount;i++)
+            {
+    document.getElementById("events_container").innerHTML += '<div class="event" id="eventcard" onclick="details_update()" > <img id="e_img" src="https://www.ujudebug.com/wp-content/uploads/2021/03/JavaScript-Logo-250x250.png" alt=""/> </div>';
+document.getElementById("det_event").innerHTML +='<div class="event_detcard" id="event_det" style="display: none;"> <h2 class="event_title"></h2> <div>  <div id="sec1" class="section_1"> <img id="event_img" src="https://www.ujudebug.com/wp-content/uploads/2021/03/JavaScript-Logo-250x250.png" alt="" /> <button class="event_register" onclick=window.location.href="https:'+data.events[i].link+'">Register</button> </div> <div id="sec2" class="section_2"> <div style=" display:flex; flex-direction:row;"> <h3 style="background-color:black;color:red;font-size:20px;width:fit-content;margin:0px !important">Prize:</h3><span class="event_prize" style="font-size: 20px; font-weight:bold;margin-left:10px; color:#1ED760;">First: 3000    Second:2000    Third:1000</span></div><div class="slide_button" style="display:flex;flex-direction:row;"> <button class="slide_desc"onclick=slidebtn() >Description</button><button class="slide_rules" onclick=slidebtn() >Rules</button> <button class="slide_contact" onclick=slidebtn() >Contact</button> </div><div class="event_slide" > <p  class="event_description"></p>  <p  class="event_rules" style="display:none;"></p> <p  class="event_contact" style="display:none;"></p> </div> </div></div> </div>';
+document.querySelectorAll('.event_title')[i].textContent=data.events[i].title;
+document.querySelectorAll('.event_img')[i].src=data.events[i].source;
+document.querySelectorAll('.event_description')[i].textContent=data.events[i].description;
+document.querySelectorAll('.event_rules')[i].textContent=data.events[i].rules;
+document.querySelectorAll('.event_contact')[i].textContent=data.events[i].contact;
+var isactive=data.events[i].active;
+if(isactive=='false')
+{
+  document.querySelectorAll('.event_register')[i].textContent='Registrations Closed';
+  document.querySelectorAll('.event_register')[i].disabled=true;
+}
+
+}
+          }
+      });
+      var x;
+      var y;
+  const detid=document.getElementById('event_det');
+  var detcard= document.querySelectorAll('.event_detcard');
+     var eventcards= document.querySelectorAll('.event');
+   
+     eventcards.forEach((card,i) => {
+      card.addEventListener("click",()=>{
+        for ( x = 0; x <datacount;x++) {
+ detcard[x].style.display='none';
+}
+        popup(i);
+      });
+      
+     });
+     var popup=function(count){
+      y=count;
+      window.scrollTo(0,0);
+      detcard[count].style.display='block';
+     }
+  function details_update(){
+    const event= document.getElementById('det_event');
+   // const ide=ele;
+    //const id1=document.getElementById('sec1');
+    // const id2=document.getElementById('sec2');
+     event.style.display='block';
+  }
+function close_card(){
+  var close=function(count){
+      detcard[count].style.display='none';
+     }
+     close(y);
+  document.getElementById('det_event').style.display='none'
+
+}
+function slidebtn(){
+  var slidedesc =document.querySelectorAll('.event_description');
+  var sliderules=document.querySelectorAll('.event_rules');
+  var slidecontact=document.querySelectorAll('.event_contact');
+  var buttondesc=document.querySelectorAll('.slide_desc');
+  var buttonrules=document.querySelectorAll('.slide_rules');
+  var buttoncontact=document.querySelectorAll('.slide_contact');
+    var cl=event.target.className;
+
+  if(cl=="slide_desc"){
+    slidedesc[y].style.display='block';
+    sliderules[y].style.display='none';
+    slidecontact[y].style.display='none';
+    buttondesc[y].style.color='red';
+    buttondesc[y].style.background='black';
+    buttonrules[y].style.color='black';
+    buttonrules[y].style.background='white';
+    buttoncontact[y].style.color='black';
+    buttoncontact[y].style.background='white';
+  }
+  else if(cl=="slide_rules")
+  {
+    slidedesc[y].style.display='none';
+    sliderules[y].style.display='block';
+    slidecontact[y].style.display='none';
+    buttonrules[y].style.color='red';
+    buttonrules[y].style.background='black';
+    buttondesc[y].style.color='black';
+    buttondesc[y].style.background='white';
+    buttoncontact[y].style.color='black';
+    buttoncontact[y].style.background='white';
+  }
+  else if(cl=="slide_contact")
+  {
+    slidedesc[y].style.display='none';
+    sliderules[y].style.display='none';
+    slidecontact[y].style.display='block';
+    buttoncontact[y].style.color='red';
+    buttoncontact[y].style.background='black';
+    buttondesc[y].style.color='black';
+    buttondesc[y].style.background='white';
+    buttonrules[y].style.color='black';
+    buttonrules[y].style.background='white';
+  }
+  }
+
+</script>
